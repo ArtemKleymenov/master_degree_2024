@@ -1,0 +1,388 @@
+openapi: 3.0.3
+info:
+  title: Face Recognition Service - OpenAPI 3.0
+  description: |-
+    This is a service for face detection and recognition. The service was created for obtaining a master's degree at NUST MISIS in the spring of 2024. Server based on the OpenAPI 3.0 specification.
+
+    Some useful links:
+    - [The Facial Recognition Service repository](https://github.com/swagger-api/swagger-petstore)
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: m1801083@edu.misis.ru
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.1
+servers:
+- url: http://localhost:8080/api/v1/
+tags:
+- name: Person
+  description: Everything about Person class
+- name: Stream
+  description: "Video stream from different sources (webcam, USB-cam, rtsp stream,\
+    \ etc.)"
+- name: Database
+  description: Operations with Database of Persons
+- name: Frame
+  description: Operations with Frame
+- name: Threshold
+  description: Operations with Threshold
+paths:
+  /Person:
+    put:
+      tags:
+      - Person
+      summary: Update an existing Person
+      description: Update an existing Person by Id
+      operationId: update_person
+      requestBody:
+        description: Update an existent Person in the db
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Person'
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Person'
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: Person not found
+        "422":
+          description: Validation exception
+      x-openapi-router-controller: swagger_server.controllers.person_controller
+    post:
+      tags:
+      - Person
+      summary: Add a new Person to the db
+      description: Add a Person pet to the db
+      operationId: add_person
+      requestBody:
+        description: Create a new Person in the db
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Person'
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Person'
+        "400":
+          description: Invalid input
+        "422":
+          description: Validation exception
+      x-openapi-router-controller: swagger_server.controllers.person_controller
+  /Person/{PersonId}:
+    get:
+      tags:
+      - Person
+      summary: Find Person by ID
+      description: Returns a single Person
+      operationId: get_person_by_id
+      parameters:
+      - name: PersonId
+        in: path
+        description: ID of Person to return
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Person'
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: Person not found
+      x-openapi-router-controller: swagger_server.controllers.person_controller
+    post:
+      tags:
+      - Person
+      summary: Updates a Person in the db with form data
+      description: ""
+      operationId: update_person_with_form
+      parameters:
+      - name: PersonId
+        in: path
+        description: ID of Person that needs to be updated
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: crop
+        in: query
+        description: Image crop of Person that needs to be updated
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: base64
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        "400":
+          description: Invalid input
+      x-openapi-router-controller: swagger_server.controllers.person_controller
+    delete:
+      tags:
+      - Person
+      summary: Deletes a Person
+      description: delete a Person
+      operationId: delete_person
+      parameters:
+      - name: PersonId
+        in: path
+        description: Person id to delete
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        "400":
+          description: Invalid Person value
+      x-openapi-router-controller: swagger_server.controllers.person_controller
+  /Stream:
+    get:
+      tags:
+      - Stream
+      summary: Returns stream URL
+      description: Returns stream URL
+      operationId: get_stream_url
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+            application/xml:
+              schema:
+                type: string
+        "404":
+          description: Stream not found
+      x-openapi-router-controller: swagger_server.controllers.stream_controller
+    post:
+      tags:
+      - Stream
+      summary: Updates a camera source URL
+      description: ""
+      operationId: update_stream_url
+      parameters:
+      - name: url
+        in: query
+        description: URL of new source for video
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        "400":
+          description: Invalid input
+      x-openapi-router-controller: swagger_server.controllers.stream_controller
+  /Stream/getFrame:
+    get:
+      tags:
+      - Stream
+      summary: Returns last frame in stream
+      description: Returns last frame in stream
+      operationId: get_stream_frame
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                format: base64
+                x-content-type: application/json
+            application/xml:
+              schema:
+                type: string
+                format: base64
+        "404":
+          description: Stream not found
+      x-openapi-router-controller: swagger_server.controllers.stream_controller
+  /Database:
+    get:
+      tags:
+      - Database
+      summary: Returns Persons db
+      description: Returns a map of Persons IDs to images
+      operationId: get_persons
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+                x-content-type: application/json
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+      x-openapi-router-controller: swagger_server.controllers.database_controller
+  /Database/createWithList:
+    post:
+      tags:
+      - Database
+      summary: Creates list of Persons with given input array
+      description: Creates list of Persons with given input array
+      operationId: create_persons_with_list_input
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Person'
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Person'
+        default:
+          description: successful operation
+      x-openapi-router-controller: swagger_server.controllers.database_controller
+  /Threshold:
+    get:
+      tags:
+      - Threshold
+      summary: Returns Threshold value
+      description: Returns Threshold value
+      operationId: get_threshold
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+            application/xml:
+              schema:
+                type: number
+                format: float32
+      x-openapi-router-controller: swagger_server.controllers.threshold_controller
+    post:
+      tags:
+      - Threshold
+      summary: Updates a service threshold
+      description: ""
+      operationId: update_threhold
+      parameters:
+      - name: thresh
+        in: query
+        description: New threshold value
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+          format: float32
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        "400":
+          description: Invalid input
+      x-openapi-router-controller: swagger_server.controllers.threshold_controller
+components:
+  schemas:
+    Person:
+      type: object
+      properties:
+        id:
+          type: string
+          example: artem
+        crop:
+          type: string
+          format: base64
+        similarity:
+          type: number
+          format: float32
+          example: 0.7
+      example:
+        similarity: 0.7
+        id: artem
+        crop: crop
+      xml:
+        name: person
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+      example:
+        code: 0
+        type: type
+        message: message
+      xml:
+        name: '##default'
+
