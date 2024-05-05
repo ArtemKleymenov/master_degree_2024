@@ -9,7 +9,7 @@ def run_fr_service():
     from collections import Counter
 
 
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(STREAM_URL)
     if not cap.isOpened():
         exit(1)
 
